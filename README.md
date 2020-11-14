@@ -482,6 +482,19 @@ console.log(anim.defaults);
 // repeatDelay: 0
 // yoyo: false
 ```
+---
+## Webpack ProvidePlugin
+
+```js
+const webpack = require('webpack');
+
+plugins:
+[
+    new webpack.ProvidePlugin({
+        anim : ['@enea-entertainment/animjs', 'anim']
+    })
+]
+```
 
 ---
 ## TODO
