@@ -6,7 +6,7 @@ Lighweight library which lets you tween multiple object's properties
 ## Features
 
 - tween, timeline, delay
-- ```onStart(), onUpdate(), onComplete()``` callbacks
+- ```onStart(), onUpdate(), onRepeat(), onComplete()``` callbacks
 - manual tick
 - ability to provide custom easing functions
 
