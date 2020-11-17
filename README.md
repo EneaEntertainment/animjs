@@ -539,4 +539,4 @@ plugins:
 ---
 ## License
 
-MIT, see [LICENSE.md](https://github.com/EneaEntertainment/animjs/blob/main/LICENSE) for details.
+MIT, see [LICENSE](LICENSE) for details.
