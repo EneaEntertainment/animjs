@@ -84,10 +84,25 @@ export default class Timeline extends Base
      *
      * fromTo
      *
+     * @param {object} target
+     * @param {object} [fromData={}]
+     * @param {object} toData
+     * @returns {Tweens}
      */
-    fromTo()
+    fromTo(target, fromData = {}, toData)
     {
-        // TODO
+        for (const i in fromData)
+        {
+            target[i] = fromData[i];
+        }
+
+        const tween = new Tween(target, toData);
+
+        tween.prepare();
+
+        this.tweens.push(tween);
+
+        return tween;
     }
 
     /**

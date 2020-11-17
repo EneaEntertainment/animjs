@@ -6,7 +6,7 @@ Lighweight library which lets you tween multiple object's properties
 ## Features
 
 - tween, timeline, delay
-- ```onStart(), onUpdate(), onComplete()``` callbacks
+- ```onStart(), onUpdate(), onRepeat(), onComplete()``` callbacks
 - manual tick
 - ability to provide custom easing functions
 
@@ -14,11 +14,13 @@ Lighweight library which lets you tween multiple object's properties
 ## Installation
 
 ```js
-npm install @enea-entertainment/animjs
+npm install --save-dev @enea-entertainment/animjs
 ```
 
+[![NPM](https://nodei.co/npm/@enea-entertainment/animjs.png?compact=true)](https://nodei.co/npm/@enea-entertainment/animjs/)
+
 ---
-## Basic example usage
+## Basic usage example
 
 ```js
 import { anim } from '@enea-entertainment/animjs';
@@ -135,6 +137,30 @@ repeat: -1
 ```
 Loop isn't really infinite, AnimJS internally uses very large number ;)
 
+```anim.fromTo();``` method allows you to override object's start values
+
+```js
+import { anim } from '@enea-entertainment/animjs';
+
+const myObject =
+    {
+        x : 0,
+        y : 1
+    };
+
+// myObject's x and y values will both start from 2
+anim.fromTo(myObject,
+    {
+        x : 2,
+        y : 2
+    },
+    {
+        duration : 1,
+        x        : 4,
+        y        : 4,
+        ease     : 'none'
+    });
+```
 ---
 ## Timeline example
 
@@ -310,6 +336,11 @@ ease: Easing.sine.inOut
 ```
 
 ---
+## Built-in easing functions
+
+Click [here](eases.md) to see complete list
+
+---
 ## Custom easing function
 
 ```js
@@ -405,12 +436,12 @@ anim.killTweensOf(myObject.scale);
 // tween2.kill();
 ```
 
-similarly you can kill entire timeline
+similarly you can kill entire timeline (which will also kill all its tweens) 
 ```js
 timeline.kill();
 ```
 
-or kill all tweens, timelines, delays at once
+Killing all tweens, timelines, delays at once:
 ```js
 anim.killAll();
 ```
@@ -433,8 +464,6 @@ const tween = anim.to(myObject,
 anim.killAll();
 tween.kill();
 ```
-
-Calling ```timeline.kill();``` will also kill all its tweens.<br><br>
 
 To protect ```anim.delay();``` set its ```protected``` property after initialization
 ```js
@@ -499,14 +528,13 @@ plugins:
 ---
 ## TODO
 
-- ```fromTo()``` method for both tween and timeline
 - repeat whole timeline
-- provide complete list of built-in easing functions
 
 ---
 ## Thank you
 
-AnimJS is based on [tweenr](https://github.com/mattdesl/tweenr) by Matt DesLauriers (@mattdesl)
+ - AnimJS is based on [tweenr](https://github.com/mattdesl/tweenr) by Matt DesLauriers (@mattdesl)
+- Robert Penner for easing functions see [terms of use](http://www.robertpenner.com/easing_terms_of_use.html)
 
 ---
 ## License
