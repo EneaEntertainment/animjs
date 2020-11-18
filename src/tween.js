@@ -1,7 +1,8 @@
+import { getTargets, isNumber } from './utils';
+
 import Base from './base';
 import { defaults } from './defaults';
 import { getEasing } from './easing';
-import { getTargets } from './utils';
 
 // eslint-disable-next-line no-empty-function
 const noop = () => {};
@@ -93,7 +94,20 @@ export default class Tween extends Base
             const value = this.values[i];
             const key = value.key;
 
-            this.target[key] = (value.start * (1 - alpha)) + (value.end * alpha);
+            if (isNumber(value.start))
+            {
+                this.target[key] = (value.start * (1 - alpha)) + (value.end * alpha);
+            }
+            else
+            {
+                for (let k = 0, l = value.end.length; k < l; k++)
+                {
+                    const valueStart = value.start[k];
+                    const valueEnd = value.end[k];
+
+                    this.target[key][k] = (valueStart * (1 - alpha)) + (valueEnd * alpha);
+                }
+            }
         }
 
         // update callback

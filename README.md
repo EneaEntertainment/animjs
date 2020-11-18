@@ -8,6 +8,7 @@ Lighweight library which lets you tween multiple object's properties
 - tween, timeline, delay
 - ```onStart(), onUpdate(), onRepeat(), onComplete()``` callbacks
 - manual tick
+- tweening array of numbers
 - ability to provide custom easing functions
 
 ---
@@ -304,6 +305,44 @@ timeline.to(myObject,
 ```
 
 ---
+## Tweening array of numbers
+
+Just like numbers, you can also tween arrays
+
+```js
+const myObject =
+    {
+        a : [3, 2, 1],
+        b : new Float32Array(3),
+        c : [0, 8, 9],
+        d : 0
+    };
+
+anim.to(myObject,
+    {
+        a : [1, 2, 3],
+        b : [4, 5, 6],
+        c : [7], // only first value will be tweened
+        d : 10,
+
+        onComplete: () =>
+        {
+            console.log(myObject.a);
+            console.log(myObject.b);
+            console.log(myObject.c);
+            console.log(myObject.d);
+
+            // outputs {object}
+
+            // myObject.a [1, 2, 3]
+            // myObject.b [4, 5, 6]
+            // myObject.c [7, 8, 9]
+            // myObject.d 10
+        }
+    });
+```
+
+---
 ## Easing
 
 could be written in different ways, all of them are valid
@@ -533,8 +572,9 @@ plugins:
 ---
 ## Thank you
 
- - AnimJS is based on [tweenr](https://github.com/mattdesl/tweenr) by Matt DesLauriers (@mattdesl)
+- AnimJS is based on [tweenr](https://github.com/mattdesl/tweenr) by Matt DesLauriers (@mattdesl)
 - Robert Penner for easing functions see [terms of use](http://www.robertpenner.com/easing_terms_of_use.html)
+- Hugh Kennedy (@hughsk) for [an-array](https://www.npmjs.com/package/an-array) check
 
 ---
 ## License
