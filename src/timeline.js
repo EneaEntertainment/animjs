@@ -107,6 +107,26 @@ export default class Timeline extends Base
 
     /**
      *
+     * seek
+     *
+     */
+    seek()
+    {
+        // TODO
+    }
+
+    /**
+     *
+     * restart
+     *
+     */
+    restart()
+    {
+        // TODO
+    }
+
+    /**
+     *
      * createGroup
      *
      * @param {string} key
@@ -194,6 +214,7 @@ export default class Timeline extends Base
      *
      * onBaseStart
      *
+     * @param {Base} base
      */
     onBaseStart()
     {
@@ -220,7 +241,7 @@ export default class Timeline extends Base
         }
 
         // update callback
-        this.onUpdate(progress);
+        this.onUpdate(this.activeGroup, progress);
     }
 
     /**
@@ -254,6 +275,7 @@ export default class Timeline extends Base
      *
      * onBaseComplete
      *
+     * @param {Base} base
      */
     onBaseComplete()
     {

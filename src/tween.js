@@ -46,6 +46,7 @@ export default class Tween extends Base
         this.baseStart.add(this);
         this.baseUpdate.add(this);
         this.baseRepeat.add(this);
+        this.baseDirection.add(this);
         this.baseComplete.add(this);
     }
 
@@ -60,9 +61,15 @@ export default class Tween extends Base
 
         if (this._isReversed)
         {
-            // force end values and swap start/end values
             this.setEndValues();
+
             this.swapValues();
+        }
+
+        // store start value
+        if (this.values.length > 0)
+        {
+            this.values[0].sStart = this.values[0].start;
         }
     }
 
@@ -70,6 +77,7 @@ export default class Tween extends Base
      *
      * onBaseStart
      *
+     * @param {Base} base
      */
     onBaseStart()
     {
@@ -83,6 +91,7 @@ export default class Tween extends Base
      *
      * @param {Base} base
      * @param {number} progress
+     * @param {number} deltaTime
      */
     onBaseUpdate(base, progress)
     {
@@ -111,24 +120,45 @@ export default class Tween extends Base
         }
 
         // update callback
-        this.onUpdate(progress, alpha);
+        this.onUpdate(this.target, progress);
     }
 
     /**
      *
      * onBaseRepeat
      *
+     * @param {Base} base
+     * @param {number} currentLoop
      */
-    onBaseRepeat()
+    onBaseRepeat(base, currentLoop)
     {
         this.setEndValues();
 
-        // repeat callback
-        this.onRepeat();
+        this.onRepeat(currentLoop);
+    }
+
+    /**
+     *
+     * onBaseDirection
+     *
+     * @param {Base} base
+     * @param {boolean} isReversed
+     */
+    onBaseDirection(base, isReversed)
+    {
+        const start = this.values[0].start;
+        const sStart = this.values[0].sStart;
+
+        // return if direction is correct
+        if (((start === sStart) && !isReversed) || ((start !== sStart) && isReversed))
+        {
+            return;
+        }
 
         // swap easing functions
-        this.easing = this.repeat % 2 === 0 ? this.yoyoEase : this.ease;
+        this.easing = isReversed ? this.yoyoEase : this.ease;
 
+        // swap values
         this.swapValues();
     }
 
@@ -136,6 +166,7 @@ export default class Tween extends Base
      *
      * onBaseComplete
      *
+     * @param {Base} base
      */
     onBaseComplete()
     {
@@ -147,7 +178,7 @@ export default class Tween extends Base
 
     /**
      *
-     * swapValues
+     * setDirection
      *
      */
     swapValues()

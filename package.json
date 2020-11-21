@@ -1,6 +1,6 @@
 {
   "name": "@enea-entertainment/animjs",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Lightweight tweening library",
   "author": "Martin Filo <animjs@enea.sk> (https://www.enea.sk/)",
   "homepage": "https://github.com/EneaEntertainment/animjs#readme",
@@ -20,7 +20,9 @@
     "tween",
     "timeline",
     "animation",
-    "array"
+    "object",
+    "array",
+    "seek"
   ],
   "scripts": {
     "lint": "eslint \"src/**/*.js\"",

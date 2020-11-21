@@ -36,6 +36,8 @@ export default class Base
             this.repeat = 1e10;
         }
 
+        this.loop = this.repeat;
+
         this.progressDuration = this.duration + this.delay;
         this.totalDuration = ((this.duration * (this.repeat + 1)) + (this.repeat * this.repeatDelay)) + this.delay;
 
@@ -43,7 +45,28 @@ export default class Base
         this.baseStart = new Runner('onBaseStart');
         this.baseUpdate = new Runner('onBaseUpdate');
         this.baseRepeat = new Runner('onBaseRepeat');
+        this.baseDirection = new Runner('onBaseDirection');
         this.baseComplete = new Runner('onBaseComplete');
+    }
+
+    /**
+     *
+     * restart
+     *
+     */
+    restart()
+    {
+        if (this.cancelling)
+        {
+            return;
+        }
+
+        this.time = 0;
+        this.active = true;
+        this.started = false;
+        this.loop = this.repeat;
+
+        this.seek(0);
     }
 
     /**
@@ -75,25 +98,25 @@ export default class Base
             }
 
             // clamp progress
-            if (progress < 0)
-            {
-                progress = 0;
-            }
-            else if (progress > 1)
-            {
-                progress = 1;
-            }
+            progress = Math.max(0, Math.min(progress, 1));
 
+            // dispatch update
             this.baseUpdate.dispatch(this, progress, deltaTime);
         }
 
         if (this.time >= this.progressDuration)
         {
-            if (this.repeat > 0)
+            if (this.loop > 0)
             {
-                this.repeat--;
+                this.loop--;
 
-                this.baseRepeat.dispatch(this);
+                // dispatch repeat
+                this.baseRepeat.dispatch(this, this.repeat - this.loop);
+
+                const isReversed = this.loop % 2 === 1;
+
+                // dispatch direction
+                this.baseDirection.dispatch(this, isReversed);
 
                 // adjust time for repeat
                 this.time -= this.duration + this.repeatDelay;
@@ -103,6 +126,7 @@ export default class Base
                 this.active = false;
                 this.cancelling = true;
 
+                // dispatch complete
                 this.baseComplete.dispatch(this);
             }
         }
@@ -112,16 +136,35 @@ export default class Base
      *
      * seek
      *
-     * @param {number} time
+     * @param {number} elapsedTime
      */
-    seek(time)
+    seek(elapsedTime)
     {
-        // TODO: count in repeat/repeatDelay
-        this.time = Math.max(0, Math.min(time, this.progressDuration));
+        elapsedTime = Math.max(0, Math.min(elapsedTime, this.totalDuration)) - this.delay;
 
-        const elapsedTime = Math.max(0, this.time - this.delay);
-        const progress = elapsedTime / this.duration;
+        let numLoops = 0;
 
+        while (elapsedTime > this.duration)
+        {
+            elapsedTime -= this.duration + this.repeatDelay;
+
+            numLoops++;
+        }
+
+        const isReversed = numLoops % 2 === 1;
+
+        // dispatch direction
+        this.baseDirection.dispatch(this, isReversed);
+
+        // set time
+        this.time = elapsedTime + this.delay;
+
+        let progress = elapsedTime / this.duration;
+
+        // clamp progress
+        progress = Math.max(0, Math.min(progress, 1));
+
+        // dispatch update
         this.baseUpdate.dispatch(this, progress, 0);
     }
 
@@ -172,6 +215,9 @@ export default class Base
 
         this.baseRepeat.destroy();
         this.baseRepeat = null;
+
+        this.baseDirection.destroy();
+        this.baseDirection = null;
 
         this.baseComplete.destroy();
         this.baseComplete = null;

@@ -9,6 +9,7 @@ Lighweight library which lets you tween multiple object's properties
 - ```onStart(), onUpdate(), onRepeat(), onComplete()``` callbacks
 - manual tick
 - tweening array of numbers
+- seek time
 - ability to provide custom easing functions
 
 ---
@@ -49,6 +50,8 @@ Whenever you want to.
 
 
 ```js
+import { anim } from '@enea-entertainment/animjs';
+
 mainUpdateLoop(deltaTime)
 {
     // request animation frame
@@ -63,6 +66,8 @@ mainUpdateLoop(deltaTime)
 or simply via ```setInterval();```
 
 ```js
+import { anim } from '@enea-entertainment/animjs';
+
 const delta = 16.7;
 
 setInterval(()=>
@@ -115,11 +120,11 @@ anim.to(myObject,
             console.log('Second tween start');
         },
 
-        onUpdate: (progress, alpha) =>
+        onUpdate: (target, progress) =>
         {
-            // progress: returns value between 0 and 1
-            // alpha: returns value from easing function
-            console.log('Second tween update:', progress, alpha);
+            // target   : returns tweened object (myObject in this case)
+            // progress : returns value between 0 and 1
+            console.log('Second tween update:', progress);
         },
 
         onComplete: () =>
@@ -136,7 +141,7 @@ For 'infinite' tween loop, provide
 ```js
 repeat: -1
 ```
-Loop isn't really infinite, AnimJS internally uses very large number ;)
+Note: loop isn't really infinite, AnimJS internally uses very large number.
 
 ```anim.fromTo();``` method allows you to override object's start values
 
@@ -310,6 +315,8 @@ timeline.to(myObject,
 Just like numbers, you can also tween arrays
 
 ```js
+import { anim } from '@enea-entertainment/animjs';
+
 const myObject =
     {
         a : [3, 2, 1],
@@ -340,6 +347,30 @@ anim.to(myObject,
             // myObject.d 10
         }
     });
+```
+
+---
+## Tween seek
+
+Jumps to a specific time
+
+```js
+import { anim } from '@enea-entertainment/animjs';
+
+const myTween = anim.to({ value: 0 },
+    {
+        paused   : true,
+        duration : 4,
+        value    : 10,
+
+        onUpdate: (target) =>
+        {
+            console.log(target.value);
+        }
+    });
+
+// outputs: 5
+myTween.seek(2);
 ```
 
 ---
@@ -398,8 +429,14 @@ const myObject =
 anim.to(myObject,
     {
         x    : 10,
-        ease : (time) => { return stepped(time, 5); }
-    })
+        ease : (time) => { return stepped(time, 5); },
+
+        onUpdate: () =>
+        {
+            // outputs: 2, 4, 6, 8, 10
+            console.log(myObject.x);
+        }
+    });
 ```
 
 ---
@@ -411,6 +448,8 @@ Sometimes you might want to use AnimJS instead of ```setTimeout();``` to delay c
 Either using ```anim.delay();``` as ```Promise```
 
 ```js
+import { anim } from '@enea-entertainment/animjs';
+
 async myMethod()
 {
     // some code
@@ -424,6 +463,8 @@ async myMethod()
 or as a callback, where 2nd parameter is required delay
 
 ```js
+import { anim } from '@enea-entertainment/animjs';
+
 myMethod()
 {
     anim.delay(()=>
@@ -439,7 +480,6 @@ myMethod()
 
 ```js
 import { anim } from '@enea-entertainment/animjs';
-
 
 const myObject =
     {
@@ -489,6 +529,8 @@ Tween or timeline can be marked as ```protected```<br>
 Such tweens/timlines will not be killed by ```anim.killAll();``` or ```tween.kill();```
 
 ```js
+import { anim } from '@enea-entertainment/animjs';
+
 const tween = anim.to(myObject,
     {
         protected : true,
@@ -506,6 +548,8 @@ tween.kill();
 
 To protect ```anim.delay();``` set its ```protected``` property after initialization
 ```js
+import { anim } from '@enea-entertainment/animjs';
+
 const myDelay = anim.delay(()=>
     {
         console.log('delay complete');
@@ -537,6 +581,8 @@ However, if you later decide to stop also ```protected``` tweens, timelines or d
 feel free to override any of these
 
 ```js
+import { anim } from '@enea-entertainment/animjs';
+
 console.log(anim.defaults);
 
 // outputs {object}:
@@ -553,6 +599,8 @@ console.log(anim.defaults);
 ---
 ## Webpack ProvidePlugin
 
+Provides ```anim``` so you don't have to import it everywhere
+
 ```js
 const webpack = require('webpack');
 
@@ -568,6 +616,8 @@ plugins:
 ## TODO
 
 - repeat whole timeline
+- timeline.seek()
+- timeline.restart()
 
 ---
 ## Thank you
