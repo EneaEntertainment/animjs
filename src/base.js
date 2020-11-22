@@ -110,10 +110,11 @@ export default class Base
             {
                 this.loop--;
 
-                // dispatch repeat
-                this.baseRepeat.dispatch(this, this.repeat - this.loop);
+                const currentLoop = this.repeat - this.loop;
+                const isReversed = currentLoop % 2 === 1;
 
-                const isReversed = this.loop % 2 === 1;
+                // dispatch repeat
+                this.baseRepeat.dispatch(this, currentLoop);
 
                 // dispatch direction
                 this.baseDirection.dispatch(this, isReversed);

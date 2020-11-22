@@ -178,7 +178,7 @@ export default class Tween extends Base
 
     /**
      *
-     * setDirection
+     * swapValues
      *
      */
     swapValues()
