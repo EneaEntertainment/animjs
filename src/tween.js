@@ -146,6 +146,11 @@ export default class Tween extends Base
      */
     onBaseDirection(base, isReversed)
     {
+        if (!this.yoyo)
+        {
+            return;
+        }
+
         const start = this.values[0].start;
         const sStart = this.values[0].sStart;
 
