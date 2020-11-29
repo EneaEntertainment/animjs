@@ -162,6 +162,13 @@ export default class Base
 
         let progress = elapsedTime / this.duration;
 
+        const isRepeatDelay = elapsedTime < 0 && numLoops !== 0;
+
+        if (!this.yoyo && isRepeatDelay)
+        {
+            progress = 1;
+        }
+
         // clamp progress
         progress = Math.max(0, Math.min(progress, 1));
 
