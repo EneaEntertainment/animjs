@@ -21,6 +21,7 @@ export default class Base
         this.cancelling = false;
         this.paused = data?.paused ?? defaults.paused;
         this.protected = data?.protected ?? defaults.protected;
+        this.autoUpdate = data?.autoUpdate ?? defaults.autoUpdate;
         this.started = false;
         this.time = 0;
         this._isReversed = false;

@@ -6,8 +6,9 @@ export const defaults =
     repeat      : 0,
     repeatDelay : 0,
 
-    paused    : false,
-    protected : false,
+    paused     : false,
+    protected  : false,
+    autoUpdate : true,
 
     ease: 'none'
 };

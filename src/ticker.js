@@ -149,7 +149,10 @@ export default class Ticker
         {
             const tween = this.tweens[i];
 
-            tween.tick(deltaTime);
+            if (tween.autoUpdate)
+            {
+                tween.tick(deltaTime);
+            }
         }
 
         // destroy inactive tweens
