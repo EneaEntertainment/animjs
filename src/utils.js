@@ -1,31 +1,4 @@
-import Base from './base';
-
-const propIsEnumerable = Object.prototype.propertyIsEnumerable;
-const ignores = ownEnumerableKeys(new Base());
 const str = Object.prototype.toString;
-
-/**
- *
- * ownEnumerableKeys
- *
- * @export
- * @param {object} obj
- * @returns {object}
- */
-export function ownEnumerableKeys(obj)
-{
-    let keys = Object.getOwnPropertyNames(obj);
-
-    if (Object.getOwnPropertySymbols)
-    {
-        keys = keys.concat(Object.getOwnPropertySymbols(obj));
-    }
-
-    return keys.filter((key) =>
-    {
-        return propIsEnumerable.call(obj, key);
-    });
-}
 
 /**
  *
@@ -39,31 +12,29 @@ export function ownEnumerableKeys(obj)
 export function getTargets(element, data)
 {
     const result = [];
-    const dataKeys = ownEnumerableKeys(data);
 
     for (const key in data)
     {
-        // copy properties as needed
-        if (dataKeys.indexOf(key) >= 0 && key in element && ignores.indexOf(key) === -1)
+        if (key in element)
         {
             const startValue = element[key];
             const endValue = data[key];
 
             if (isNumber(startValue) && isNumber(endValue))
             {
-                result.push({
-                    key   : key,
-                    start : startValue,
-                    end   : endValue
-                });
+                result.push([
+                    key,
+                    startValue,
+                    endValue
+                ]);
             }
             else if (isArray(startValue) && isArray(endValue))
             {
-                result.push({
-                    key   : key,
-                    start : startValue.slice(),
-                    end   : mergeArrays(startValue, endValue)
-                });
+                result.push([
+                    key,
+                    startValue.slice(),
+                    mergeArrays(startValue, endValue)
+                ]);
             }
         }
     }
@@ -95,6 +66,28 @@ export function isNumber(value)
 export function isArray(value)
 {
     return (value.BYTES_PER_ELEMENT && str.call(value.buffer) === '[object ArrayBuffer]') || Array.isArray(value);
+}
+
+/**
+ *
+ * arraysEqual
+ *
+ * @export
+ * @param {array} a
+ * @param {array} b
+ * @returns {boolean}
+ */
+export function arraysEqual(a, b)
+{
+    for (let i = 0; i < a.length; i++)
+    {
+        if (a[i] !== b[i])
+        {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 /**

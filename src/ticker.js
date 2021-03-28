@@ -1,4 +1,3 @@
-import Base from './base';
 import Timeline from './timeline';
 import Tween from './tween';
 import { defaults } from './defaults';
@@ -110,30 +109,36 @@ export default class Ticker
      * @param {number} duration
      * @returns {Base|Promise}
      */
-    delay(callback, duration = callback)
+    delay(callback, duration)
     {
-        const data =
-            {
-                duration : duration || defaults.duration,
-                delay    : 0
-            };
-
-        const base = new Base(data);
-
-        this.tweens.push(base);
-
         if (typeof callback === 'function')
         {
-            base.onBaseComplete = callback;
-            base.baseComplete.add(base);
+            const data =
+                {
+                    duration   : duration || defaults.duration,
+                    onComplete : callback,
+                    delay      : 0
+                };
 
-            return base;
+            const tween = new Tween({}, data);
+
+            this.tweens.push(tween);
+
+            return tween;
         }
 
         return new Promise((resolve) =>
         {
-            base.onBaseComplete = resolve;
-            base.baseComplete.add(base);
+            const data =
+                {
+                    duration   : callback || defaults.duration,
+                    onComplete : resolve,
+                    delay      : 0
+                };
+
+            const tween = new Tween({}, data);
+
+            this.tweens.push(tween);
         });
     }
 
@@ -145,7 +150,7 @@ export default class Ticker
      */
     tick(deltaTime)
     {
-        for (let i = 0; i < this.tweens.length; i++)
+        for (let i = 0, j = this.tweens.length; i < j; i++)
         {
             const tween = this.tweens[i];
 

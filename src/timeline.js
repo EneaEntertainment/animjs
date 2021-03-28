@@ -1,4 +1,3 @@
-import Base from './base';
 import Tween from './tween';
 import { mixins } from './mixins';
 import { randomString } from './utils';
@@ -12,9 +11,9 @@ const noop = () => {};
  *
  * @export
  * @class Timeline
- * @extends {Base}
+ * @extends {Tween}
  */
-export default class Timeline extends Base
+export default class Timeline extends Tween
 {
     /**
      * Creates an instance of Timeline.
@@ -26,20 +25,21 @@ export default class Timeline extends Base
         // bypass defaults
         data.duration = 0;
 
-        super(data);
+        super({}, data, true);
 
-        this.onStart = data?.onStart ?? noop;
-        this.onUpdate = data?.onUpdate ?? noop;
-        this.onComplete = data?.onComplete ?? noop;
+        this.onTimelineStart = data?.onStart ?? noop;
+        this.onTimelineUpdate = data?.onUpdate ?? noop;
+        this.onTimelineRepeat = data?.onRepeat ?? noop;
+        this.onTimelineComplete = data?.onComplete ?? noop;
+
+        this.runnerStart.add(this);
+        this.runnerUpdate.add(this);
+        this.runnerRepeat.add(this);
+        this.runnerComplete.add(this);
 
         this.tweens = [];
         this.groups = new Map();
         this.activeGroup = 0;
-
-        // base runners
-        this.baseStart.add(this);
-        this.baseUpdate.add(this);
-        this.baseComplete.add(this);
     }
 
     /**
@@ -169,7 +169,6 @@ export default class Timeline extends Base
         if (isActiveGroup)
         {
             this.duration = Math.max(this.duration, group.duration);
-            this.progressDuration = this.duration + this.delay;
 
             tween.prepare();
 
@@ -212,36 +211,47 @@ export default class Timeline extends Base
 
     /**
      *
-     * onBaseStart
+     * onStart
      *
-     * @param {Base} base
      */
-    onBaseStart()
+    onStart()
     {
-        // start callback
-        this.onStart();
+        this.onTimelineStart();
     }
 
     /**
      *
-     * onBaseUpdate
+     * onUpdate
      *
-     * @param {Base} base
+     * @param {object} target
      * @param {number} progress
      * @param {number} deltaTime
      */
-    onBaseUpdate(base, progress, deltaTime)
+    onUpdate(target, progress, deltaTime)
     {
-        // update tweens
+        // update children
         for (let i = 0, j = this.tweens.length; i < j; i++)
         {
             const tween = this.tweens[i];
 
-            tween.tick(deltaTime);
+            if (tween.autoUpdate)
+            {
+                tween.tick(deltaTime);
+            }
         }
 
         // update callback
-        this.onUpdate(this.activeGroup, progress);
+        this.onTimelineUpdate(this.activeGroup, progress);
+    }
+
+    /**
+     *
+     * onRepeat
+     *
+     */
+    onRepeat()
+    {
+        // TODO
     }
 
     /**
@@ -259,7 +269,6 @@ export default class Timeline extends Base
         this.time = 0;
         this.duration = group.duration;
         this.delay = 0;
-        this.progressDuration = this.duration;
         this.tweens = group.tweens;
 
         for (let i = 0; i < this.tweens.length; i++)
@@ -273,18 +282,17 @@ export default class Timeline extends Base
 
     /**
      *
-     * onBaseComplete
+     * onComplete
      *
-     * @param {Base} base
      */
-    onBaseComplete()
+    onComplete()
     {
         this.activeGroup++;
 
         // complete callback; also when there are no tweens attached
         if (this.activeGroup >= this.groups.size)
         {
-            this.onComplete();
+            this.onTimelineComplete();
 
             return;
         }

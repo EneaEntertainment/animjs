@@ -75,12 +75,18 @@ export default
             }),
 
             replace({
-                exclude     : 'node_modules/**',
-                __VERSION__ : `${pkg.version}`
+                exclude           : 'node_modules/**',
+                preventAssignment : true,
+
+                values:
+                    {
+                        __VERSION__: `${pkg.version}`
+                    }
             }),
 
             babel({
-                presets: ['@babel/preset-env']
+                presets      : ['@babel/preset-env'],
+                babelHelpers : 'bundled'
             }),
 
             terser(terserOptions)
