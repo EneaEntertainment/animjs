@@ -70,28 +70,6 @@ export function isArray(value)
 
 /**
  *
- * arraysEqual
- *
- * @export
- * @param {array} a
- * @param {array} b
- * @returns {boolean}
- */
-export function arraysEqual(a, b)
-{
-    for (let i = 0; i < a.length; i++)
-    {
-        if (a[i] !== b[i])
-        {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-/**
- *
  * mergeArrays
  *
  * @export

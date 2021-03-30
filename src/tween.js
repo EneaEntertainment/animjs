@@ -1,13 +1,11 @@
-import { arraysEqual, getTargets } from './utils';
-
 import Runner from './runner';
 import { defaults } from './defaults';
 import { getEasing } from './easing';
+import { getTargets } from './utils';
 
 const KEY = 0;
 const START = 1;
 const END = 2;
-const SSTART = 3;
 
 /**
  *
@@ -30,6 +28,7 @@ export default class Tween
         this.target = target;
         this.data = data;
         this.values = [];
+        this.valuesStored = [];
         this.active = true;
         this.cancelling = false;
         this.paused = data?.paused ?? defaults.paused;
@@ -90,27 +89,66 @@ export default class Tween
 
     /**
      *
+     * copyValues
+     *
+     * @param {boolean} isReversed
+     */
+    copyValues(isReversed)
+    {
+        this.values = [];
+
+        for (let i = 0; i < this.valuesStored.length; i++)
+        {
+            const valueStored = this.valuesStored[i];
+
+            const startValue = isReversed ? valueStored[END] : valueStored[START];
+            const endValue = isReversed ? valueStored[START] : valueStored[END];
+
+            this.values.push([valueStored[KEY], startValue, endValue]);
+        }
+    }
+
+    /**
+      *
+      * setValues
+      *
+      * @param {number} valueKey
+      */
+    setValues(valueKey)
+    {
+        for (let i = 0, j = this.values.length; i < j; i++)
+        {
+            const target = this.values[i];
+
+            const key = target[KEY];
+            const value = target[valueKey];
+
+            if (typeof value === 'number')
+            {
+                this.target[key] = value;
+            }
+            else
+            {
+                for (let k = 0, l = value.length; k < l; k++)
+                {
+                    this.target[key][k] = value[k];
+                }
+            }
+        }
+    }
+
+    /**
+     *
      * prepare
      *
      */
     prepare()
     {
-        this.values = getTargets(this.target, this.data);
+        this.valuesStored = getTargets(this.target, this.data);
 
-        if (this._isReversed)
-        {
-            this.setEndValues();
+        this.copyValues(this._isReversed);
 
-            this.swapValues();
-        }
-
-        // store start value
-        if (this.values.length > 0)
-        {
-            const startValue = this.values[0][START];
-
-            this.values[0].push(typeof startValue === 'number' ? startValue : startValue.slice());
-        }
+        this.setValues(START);
     }
 
     /**
@@ -167,50 +205,15 @@ export default class Tween
 
     /**
      *
-     * isCorrectDirection
-     *
-     * @param {boolean} isReversed
-     * @returns {boolean}
-     */
-    isCorrectDirection(isReversed)
-    {
-        const start = this.values[0][START];
-        const sStart = this.values[0][SSTART];
-
-        if (typeof start === 'number')
-        {
-            if (((start === sStart) && !isReversed) || ((start !== sStart) && isReversed))
-            {
-                return true;
-            }
-        }
-        else if ((arraysEqual(start, sStart) && !isReversed) || (!arraysEqual(start, sStart) && isReversed))
-        {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     *
      * updateDirection
      *
      * @param {boolean} isReversed
      */
     updateDirection(isReversed)
     {
-        // return if direction is correct
-        if (this.isCorrectDirection(isReversed))
-        {
-            return;
-        }
+        this.copyValues(isReversed);
 
-        // swap easing functions
         this.easing = isReversed ? this.yoyoEase : this.ease;
-
-        // swap values
-        this.swapValues();
     }
 
     /**
@@ -258,17 +261,17 @@ export default class Tween
             {
                 this.loop--;
 
-                this.setEndValues();
+                this.setValues(END);
 
                 const currentLoop = this.repeat - this.loop;
 
                 this.runnerRepeat.dispatch(currentLoop);
 
                 // direction
-                const isReversed = currentLoop % 2 === 1;
-
                 if (this.yoyo)
                 {
+                    const isReversed = currentLoop % 2 === (this._isReversed ? 0 : 1);
+
                     this.updateDirection(isReversed);
                 }
 
@@ -280,62 +283,9 @@ export default class Tween
                 this.active = false;
                 this.cancelling = true;
 
-                this.setEndValues();
+                this.setValues(END);
 
                 this.runnerComplete.dispatch();
-            }
-        }
-    }
-
-    /**
-     *
-     * swapValues
-     *
-     */
-    swapValues()
-    {
-        for (let i = 0, j = this.values.length; i < j; i++)
-        {
-            const value = this.values[i];
-
-            if (typeof value[START] === 'number')
-            {
-                [value[START], value[END]] = [value[END], value[START]];
-            }
-            else
-            {
-                for (let k = 0, l = value[START].length; k < l; k++)
-                {
-                    [value[START][k], value[END][k]] = [value[END][k], value[START][k]];
-                }
-            }
-        }
-    }
-
-    /**
-     *
-     * setEndValues
-     *
-     */
-    setEndValues()
-    {
-        for (let i = 0, j = this.values.length; i < j; i++)
-        {
-            const target = this.values[i];
-
-            const key = target[KEY];
-            const end = target[END];
-
-            if (typeof end === 'number')
-            {
-                this.target[key] = end;
-            }
-            else
-            {
-                for (let k = 0, l = end.length; k < l; k++)
-                {
-                    this.target[key][k] = end[k];
-                }
             }
         }
     }
@@ -360,10 +310,10 @@ export default class Tween
         }
 
         // direction
-        const isReversed = currentLoop % 2 === 1;
-
         if (this.yoyo)
         {
+            const isReversed = currentLoop % 2 === (this._isReversed ? 0 : 1);
+
             this.updateDirection(isReversed);
         }
 
