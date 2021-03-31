@@ -315,20 +315,11 @@ export default class Timeline extends Tween
         }
 
         // kill tweens in all groups
-        let index = 0;
-
         if (this.groups)
         {
             this.groups.forEach((value) =>
             {
                 let tweens = value.tweens;
-
-                if (index === this.activeGroup)
-                {
-                    return;
-                }
-
-                index++;
 
                 for (let i = 0; i < tweens.length; i++)
                 {
@@ -341,12 +332,24 @@ export default class Timeline extends Tween
                 tweens = [];
             });
 
-            this.killAll(true);
-
             this.groups = null;
         }
 
+        this.tweens = [];
+
         super.kill();
+    }
+
+    /**
+     *
+     * destroy
+     *
+     */
+    destroy()
+    {
+        this.kill(true);
+
+        super.destroy();
     }
 }
 

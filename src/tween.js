@@ -28,9 +28,11 @@ export default class Tween
         this.target = target;
         this.data = data;
         this.values = [];
-        this.valuesStored = [];
+        this.valuesInitial = [];
+
         this.active = true;
         this.cancelling = false;
+        this.finished = false;
         this.paused = data?.paused ?? defaults.paused;
         this.protected = data?.protected ?? defaults.protected;
         this.autoUpdate = data?.autoUpdate ?? defaults.autoUpdate;
@@ -97,14 +99,14 @@ export default class Tween
     {
         this.values = [];
 
-        for (let i = 0; i < this.valuesStored.length; i++)
+        for (let i = 0; i < this.valuesInitial.length; i++)
         {
-            const valueStored = this.valuesStored[i];
+            const value = this.valuesInitial[i];
 
-            const startValue = isReversed ? valueStored[END] : valueStored[START];
-            const endValue = isReversed ? valueStored[START] : valueStored[END];
+            const startValue = isReversed ? value[END] : value[START];
+            const endValue = isReversed ? value[START] : value[END];
 
-            this.values.push([valueStored[KEY], startValue, endValue]);
+            this.values.push([value[KEY], startValue, endValue]);
         }
     }
 
@@ -144,7 +146,7 @@ export default class Tween
      */
     prepare()
     {
-        this.valuesStored = getTargets(this.target, this.data);
+        this.valuesInitial = getTargets(this.target, this.data);
 
         this.copyValues(this._isReversed);
 
@@ -158,7 +160,7 @@ export default class Tween
      */
     restart()
     {
-        if (this.cancelling)
+        if (this.finished)
         {
             return;
         }
@@ -207,10 +209,12 @@ export default class Tween
      *
      * updateDirection
      *
-     * @param {boolean} isReversed
+     * @param {number} currentLoop
      */
-    updateDirection(isReversed)
+    updateDirection(currentLoop)
     {
+        const isReversed = currentLoop % 2 === (this._isReversed ? 0 : 1);
+
         this.copyValues(isReversed);
 
         this.easing = isReversed ? this.yoyoEase : this.ease;
@@ -270,9 +274,7 @@ export default class Tween
                 // direction
                 if (this.yoyo)
                 {
-                    const isReversed = currentLoop % 2 === (this._isReversed ? 0 : 1);
-
-                    this.updateDirection(isReversed);
+                    this.updateDirection(currentLoop);
                 }
 
                 // adjust time for repeat
@@ -312,13 +314,14 @@ export default class Tween
         // direction
         if (this.yoyo)
         {
-            const isReversed = currentLoop % 2 === (this._isReversed ? 0 : 1);
-
-            this.updateDirection(isReversed);
+            this.updateDirection(currentLoop);
         }
 
         // time
         this.time = time;
+
+        // loop
+        this.loop = this.repeat - currentLoop;
 
         // progress
         this.progress = time / this.duration;
@@ -362,19 +365,35 @@ export default class Tween
      */
     destroy()
     {
+        if (this.finished)
+        {
+            return;
+        }
+
+        this.finished = true;
+
+        this.target = null;
+        this.data = null;
+        this.values = null;
+        this.valuesInitial = null;
+
         this.active = null;
         this.cancelling = null;
         this.paused = null;
         this.protected = null;
+        this.autoUpdate = null;
         this.started = null;
-        this.time = null;
         this._isReversed = null;
 
         this.delay = null;
         this.duration = null;
         this.repeat = null;
         this.repeatDelay = null;
+        this.time = null;
+        this.loop = null;
+        this.progress = null;
         this.totalDuration = null;
+
         this.yoyo = null;
         this.ease = null;
         this.yoyoEase = null;
