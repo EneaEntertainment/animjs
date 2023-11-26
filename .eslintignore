@@ -1,2 +1,4 @@
-/_dist
-/node_modules
+node_modules
+_dist
+_dist-tsc
+*.js

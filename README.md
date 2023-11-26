@@ -2,14 +2,18 @@
 
 Lighweight library which lets you tween multiple object's properties
 
+##### Dependency: [Runner](https://github.com/EneaEntertainment/runner)
+
 ---
 ## Features
 
-- tween, timeline, delay
+- tween, timeline, delay, wait
 - ```onStart(), onUpdate(), onRepeat(), onComplete()``` callbacks
 - manual tick
 - tweening array of numbers
 - seek time
+- time scale
+- animation groups
 - ability to provide custom easing functions
 
 ---
@@ -231,8 +235,9 @@ timeline.to(myObject,
     });    
 ```
 
-It is also possible to create groups in timeline by providing 3rd parameter ```{string}```<br>
-Second group in timeline will start after all tweens of first group have finished.
+It is also possible to start tweens in timeline at the same time by providing 3rd parameter - label```{string}```
+
+All tweens groupped by ```labelB``` will start after all tweens in label ```labelA``` have finished.
 
 ```js
 import { anim } from '@enea-entertainment/animjs';
@@ -268,7 +273,7 @@ timeline.to(myObject,
         {
             console.log('a1 complete');
         }
-    }, 'groupA');
+    }, 'labelA');
 
 // a2 will finish after two seconds
 timeline.to(myObject,
@@ -280,7 +285,7 @@ timeline.to(myObject,
         {
             console.log('a2 complete');
         }
-    }, 'groupA');
+    }, 'labelA');
 
 // then b1 will start
 // b1 will finish after 4 seconds, notice repeat param
@@ -294,9 +299,9 @@ timeline.to(myObject,
         {
             console.log('b1 complete');
         }
-    }, 'groupB');
+    }, 'labelB');
 
-// b2 will finish 2 seconds after groupA has finished
+// b2 will finish 2 seconds after labelA has finished
 timeline.to(myObject,
     {
         duration : 2,
@@ -306,7 +311,7 @@ timeline.to(myObject,
         {
             console.log('b2 complete');
         }
-    }, 'groupB');
+    }, 'labelB');
 ```
 
 ---
@@ -372,21 +377,48 @@ const myTween = anim.to({ value: 0 },
 // outputs: 5
 myTween.seek(2);
 ```
+---
+## Time scale
+
+time scale can be used to speed up or slow down tweens. You can either set it globally or per tween
+    
+```js
+import { anim } from '@enea-entertainment/animjs';
+
+// global time scale
+// all tweens will be affected, playing at double speed
+anim.timeScale = 2;
+```
+or individually
+```js
+import { anim } from '@enea-entertainment/animjs';
+
+const tween = anim.to({ value: 0 },
+    {
+        duration : 1,
+        value    : 1,
+    });
+
+// tween will play at double speed
+// and will finish in 0.5 seconds
+tween.timeScale = 2;
+```
 
 ---
+## Built-in easing functions
+
+'none' == 'linear' | 'back' | 'bounce' | 'circ' | 'cubic' | 'elastic' | 'expo' | 'quad' | 'quart' | 'quint' | 'sine'
+
+---
+
 ## Easing
 
 could be written in different ways, all of them are valid
+
 ```js
 ease: 'sineIn'
 ease: 'sineOut'
 ease: 'sineInOut'
-```
-
-```js
-ease: 'sine.in'
-ease: 'sine.out'
-ease: 'sine.inOut'
 ```
 
 ```js
@@ -406,11 +438,7 @@ ease: Easing.sine.inOut
 ```
 
 ---
-## Built-in easing functions
 
-Click [here](eases.md) to see complete list
-
----
 ## Custom easing function
 
 ```js
@@ -443,24 +471,9 @@ anim.to(myObject,
 ## Delaying code execution
 
 
-Sometimes you might want to use AnimJS instead of ```setTimeout();``` to delay code execution.<br>
+Because AnimJS ```tick();``` is updated manually, sometimes you might want to use AnimJS instead of ```setTimeout();``` to delay code execution.<br>
 
-Either using ```anim.delay();``` as ```Promise```
-
-```js
-import { anim } from '@enea-entertainment/animjs';
-
-async myMethod()
-{
-    // some code
-
-    await anim.delay(1);
-
-    // some other code, that will be excuted 1 second later
-}
-```
-
-or as a callback, where 2nd parameter is required delay
+Either using ```anim.delay();``` where 1st parameter is callback and 2nd parameter is required delay (in seconds)
 
 ```js
 import { anim } from '@enea-entertainment/animjs';
@@ -472,6 +485,61 @@ myMethod()
         // some code
     }, 1);
 }
+```
+
+or by using ```anim.wait();``` which returns promise
+
+```js
+import { anim } from '@enea-entertainment/animjs';
+
+anim.wait(1).then(()=>
+{
+    // some code
+});
+```
+
+or
+
+```js
+import { anim } from '@enea-entertainment/animjs';
+
+async myMethod()
+{
+    await anim.wait(1);
+
+    // some code
+}
+```
+---
+### Animation groups
+
+Tweens, timelines and delays can be grouped together and then paused, resumed or killed at once
+
+```js
+import { anim } from '@enea-entertainment/animjs';
+
+const enum TweenGroup
+    {
+        INTRO,
+        GAME
+    }
+
+const introTween1 = anim.to({value : 0},
+    {
+        duration : 1,
+        group    : TweenGroup.INTRO
+        value    : 1,
+    });
+ 
+const introTween2 = anim.to({value : 2},
+    {
+        duration : 1,
+        group    : TweenGroup.INTRO
+        value    : 3,
+    });   
+
+// kills all tweens in TweenGroup.INTRO
+anim.group[TweenGroup.INTRO].kill();
 ```
 
 ---

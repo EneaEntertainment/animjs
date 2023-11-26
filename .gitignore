@@ -23,10 +23,8 @@ lerna-debug.log
 !.gitkeep
 *__temp
 /node_modules
+/_dist
+/_dist-tsc*
 
 # jetBrains IDE ignores
 .idea
-
-# VSCode ignores
-.vscode
-*.code-workspace

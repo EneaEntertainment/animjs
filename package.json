@@ -1,47 +1,56 @@
 {
-  "name": "@enea-entertainment/animjs",
-  "version": "0.3.2",
-  "description": "Lightweight tweening library",
-  "author": "Martin Filo <animjs@enea.sk> (https://www.enea.sk/)",
-  "homepage": "https://github.com/EneaEntertainment/animjs#readme",
-  "license": "MIT",
-  "main": "_dist/anim.js",
-  "files": [
-    "_dist"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/EneaEntertainment/animjs.git"
-  },
-  "bugs": {
-    "url": "https://github.com/EneaEntertainment/animjs/issues"
-  },
-  "keywords": [
-    "tween",
-    "timeline",
-    "animation",
-    "object",
-    "array",
-    "seek"
-  ],
-  "scripts": {
-    "lint": "eslint \"src/**/*.js\"",
-    "lintfix": "eslint \"src/**/*.js\" --fix",
-    "prebuild": "rimraf _dist/*",
-    "build": "rollup -c"
-  },
-  "devDependencies": {
-    "@babel/core": "^7.13.13",
-    "@babel/preset-env": "^7.13.12",
-    "@rollup/plugin-babel": "^5.3.0",
-    "@rollup/plugin-node-resolve": "^11.2.1",
-    "@rollup/plugin-replace": "^2.4.2",
-    "babel-eslint": "^10.1.0",
-    "eslint": "^7.22.0",
-    "rimraf": "^3.0.2",
-    "rollup": "^2.43.0",
-    "rollup-plugin-sourcemaps": "^0.6.3",
-    "rollup-plugin-terser": "^7.0.2"
-  },
-  "dependencies": {}
+    "name": "@enea-entertainment/animjs",
+    "version": "1.0.0",
+    "description": "Lighweight tweening library",
+    "author": "Martin Filo <npm@enea.sk> (https://www.enea.sk/)",
+    "homepage": "https://www.enea.sk/",
+    "license": "MIT",
+    "main": "index.js",
+    "type": "module",
+    "types": "index.d.ts",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/EneaEntertainment/animjs.git"
+    },
+    "bugs": {
+        "url": "https://github.com/EneaEntertainment/animjs"
+    },
+    "keywords": [
+        "tween",
+        "timeline",
+        "animation",
+        "pixi.js"
+    ],
+    "volta": {
+        "node": "20.7.0",
+        "npm": "10.1.0"
+    },
+    "scripts": {
+        "lint": "eslint \"src/**/*.ts\"",
+        "lintfix": "eslint \"src/**/*.ts\" --fix",
+        "lintfixDts": "eslint \"_dist/index.d.ts\" --fix --no-ignore",
+        "prebuild": "rimraf _dist && rimraf _dist-tsc",
+        "dts": "tsc --build tsconfig.json",
+        "cleanup": "rimraf _dist-tsc",
+        "build": "npm run dts && tsc && rollup -c && npm run cleanup && npm run lintfixDts"
+    },
+    "dependencies": {
+        "@enea-entertainment/runner": "^2.0.0"
+    },
+    "devDependencies": {
+        "@rollup/plugin-node-resolve": "^15.0.2",
+        "@types/node": "^18.11.11",
+        "@typescript-eslint/eslint-plugin": "^6.1.0",
+        "@typescript-eslint/parser": "^6.1.0",
+        "eslint-plugin-import": "^2.28.0",
+        "eslint": "^8.23.1",
+        "prepend": "^1.0.2",
+        "rimraf": "^3.0.2",
+        "rollup-plugin-copy": "^3.4.0",
+        "rollup-plugin-dts": "^5.3.0",
+        "rollup-plugin-esbuild": "^5.0.0",
+        "rollup-plugin-generate-package-json": "^3.2.0",
+        "rollup": "^3.20.6",
+        "typescript": "^5.1.6"
+    }
 }

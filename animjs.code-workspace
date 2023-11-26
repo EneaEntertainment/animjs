@@ -1,0 +1,22 @@
+{
+	"folders":
+    [
+		{
+			"path": "."
+		}
+	],
+    "settings":
+	{
+		"files.exclude":
+		{
+			"node_modules": true
+		},
+		
+		"search.exclude":
+		{
+			"_dist": true,
+			"node_modules": true,
+			"package*.json": true
+		}
+	}
+}

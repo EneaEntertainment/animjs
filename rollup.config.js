@@ -1,94 +1,74 @@
-/* eslint-disable no-unused-vars */
-import babel from '@rollup/plugin-babel';
-import pkg from './package.json';
-import replace from '@rollup/plugin-replace';
-import resolve from '@rollup/plugin-node-resolve';
-import { terser } from 'rollup-plugin-terser';
+import dts from 'rollup-plugin-dts';
+import pkg from './package.json' assert { type: 'json' };
+import copy from 'rollup-plugin-copy';
+import generatePackageJson from 'rollup-plugin-generate-package-json';
+import esbuild from 'rollup-plugin-esbuild';
 
 const banner =
     [
         `/*!`,
         `*`,
-        `* AnimJS (${pkg.name})`,
+        `* ${pkg.name}`,
         `*`,
         `* @version  : ${pkg.version}`,
         `* @author   : Enea Entertainment`,
-        `* @homepage : http://www.enea.sk/`,
-        `* @license  : MIT`,
+        `* @homepage : https://www.enea.sk/`,
         `*`,
         `*/`
     ].join('\n');
 
-/* eslint-disable camelcase */
-const terserOptions =
+export default [
     {
-        ecma     : 5,
-        warnings : false,
-        parse    : {},
-        compress :
-            {
-                drop_console: true
-            },
-        mangle          : true,
-        module          : false,
-        toplevel        : false,
-        nameCache       : null,
-        ie8             : false,
-        keep_classnames : undefined,
-        keep_fnames     : false,
-        safari10        : false
-    };
+        input: '_dist-tsc/index.js',
 
-const freeze = true;
-const sourcemap = true;
+        plugins: [
+            esbuild(),
 
-export default
-{
-    input: 'src/index.js',
+            copy({ targets: [{ src: ['README.md', 'LICENSE', 'global.d.ts'], dest: '_dist' }] }),
 
-    treeshake: false,
-
-    external:
-        [
-            ...Object.keys(pkg.peerDependencies || {})
+            generatePackageJson({
+                baseContents: (pkg) => ({
+                    name             : pkg.name,
+                    version          : pkg.version,
+                    description      : pkg.description,
+                    author           : pkg.author,
+                    homepage         : pkg.homepage,
+                    license          : pkg.license,
+                    main             : pkg.main,
+                    type             : pkg.type,
+                    types            : pkg.types,
+                    repository       : pkg.repository,
+                    bugs             : pkg.bugs,
+                    keywords         : pkg.keywords,
+                    scripts          : {},
+                    dependencies     : pkg?.dependencies ?? {},
+                    peerDependencies : pkg?.peerDependencies ?? {}
+                })
+            })
         ],
 
-    output:
-        [
-            {
-                banner,
-                file    : '_dist/anim.js',
-                format  : 'umd',
-                name    : 'anim',
-                freeze,
-                sourcemap,
-                globals : {}
-            }
-        ],
+        treeshake: false,
 
-    plugins:
-        [
-            resolve({
-                jsnext  : true,
-                main    : true,
-                browser : true
-            }),
+        external:
+            [
+                ...Object.keys(pkg.peerDependencies || {})
+            ],
 
-            replace({
-                exclude           : 'node_modules/**',
-                preventAssignment : true,
+        output:
+            [
+                {
+                    banner,
+                    file      : '_dist/index.js',
+                    format    : 'es',
+                    freeze    : true,
+                    sourcemap : true
+                }
+            ]
+    },
 
-                values:
-                    {
-                        __VERSION__: `${pkg.version}`
-                    }
-            }),
-
-            babel({
-                presets      : ['@babel/preset-env'],
-                babelHelpers : 'bundled'
-            }),
-
-            terser(terserOptions)
-        ]
-};
+    {
+        input   : './src/index.ts',
+        output  : [{ file: '_dist/index.d.ts', format: 'es' }],
+        plugins : [dts()]
+    }
+];
