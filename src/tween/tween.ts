@@ -67,10 +67,10 @@ export default class Tween
         {
             const groupName = data.group;
 
-            if (typeof animGroup[groupName] === 'undefined')
-                animGroup[groupName] = new Group();
+            if (!animGroup.has(groupName))
+                animGroup.set(groupName, new Group());
 
-            animGroup[groupName].push(this);
+            animGroup.get(groupName)!.push(this);
 
             this.groupName = groupName;
         }
@@ -269,8 +269,7 @@ export default class Tween
         this.destroyed = true;
         this.target = null;
 
-        if (typeof this.groupName !== 'undefined' && typeof animGroup[this.groupName] !== 'undefined')
-            animGroup[this.groupName].remove(this);
+        animGroup.get(this.groupName)?.remove(this);
     }
 
     get totalDuration(): number

@@ -539,7 +539,7 @@ const introTween2 = anim.to({value : 2},
     });   
 
 // kills all tweens in TweenGroup.INTRO
-anim.group[TweenGroup.INTRO].kill();
+anim.group.get(TweenGroup.INTRO)?.kill();
 ```
 
 ---

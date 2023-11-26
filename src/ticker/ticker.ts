@@ -1,6 +1,7 @@
 import Delay from '../delay/delay';
 import type Group from '../group/group';
 import type { IDelayData } from '../delay/delay-types';
+import type { IGroupLabel } from '../shared';
 import type { ITimelineData } from '../timeline/timeline-types';
 import type { ITweenData } from '../tween/tween-types';
 import Timeline from '../timeline/timeline';
@@ -10,7 +11,7 @@ import { defaultSettings } from '../shared';
 export default class Ticker
 {
     defaults: Partial<ITweenData>;
-    group: Record<string, Group> = {};
+    group: Map<IGroupLabel, Group>;
     readonly tweens: Array<Delay | Timeline | Tween> = [];
 
     timeScale = 1;
@@ -20,6 +21,7 @@ export default class Ticker
         const tween = new Tween(target, data);
 
         tween.prepare();
+
         this.tweens.push(tween);
 
         return tween;
@@ -30,7 +32,9 @@ export default class Ticker
         const tween = new Tween(target, data);
 
         tween._isReversed = true;
+
         tween.prepare();
+
         this.tweens.push(tween);
 
         return tween;
@@ -44,6 +48,7 @@ export default class Ticker
         const tween = new Tween(target, toData);
 
         tween.prepare();
+
         this.tweens.push(tween);
 
         return tween;
@@ -61,11 +66,11 @@ export default class Ticker
     delay(callback: (...args: Array<any>)=> void, duration?: any, groupName?: string | number): Delay
     {
         const data: Partial<IDelayData> =
-                {
-                    duration   : duration ?? defaultSettings.duration,
-                    group      : groupName,
-                    onComplete : callback
-                };
+            {
+                duration   : duration ?? defaultSettings.duration,
+                group      : groupName,
+                onComplete : callback
+            };
 
         const delay = new Delay(data);
 
@@ -80,7 +85,7 @@ export default class Ticker
         {
             const data: Partial<IDelayData> =
                 {
-                    duration : duration || defaultSettings.duration,
+                    duration : duration ?? defaultSettings.duration,
                     group    : groupName,
 
                     onComplete: () =>
