@@ -1,10 +1,10 @@
-import { Easing, cubicBezier, stepped } from './easing';
+import { Easing, cubicBezier, stepped } from './easing/easing';
 import { animGroup, defaultSettings } from './shared';
 
-import Delay from './delay';
-import Ticker from './ticker';
-import Timeline from './timeline';
-import Tween from './tween';
+import Delay from './delay/delay';
+import Ticker from './ticker/ticker';
+import Timeline from './timeline/timeline';
+import Tween from './tween/tween';
 
 const ticker = new Ticker();
 

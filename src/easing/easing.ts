@@ -1,12 +1,7 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-mixed-operators */
 
-type EasingKeys = keyof typeof Easing;
-
-export type IStringEasings =
-    EasingKeys &
-        Exclude<EasingKeys, 'Function' | 'prototype'> &
-        Exclude<EasingKeys, 'back' | 'bounce' | 'circ' | 'cubic' | 'elastic' | 'expo' | 'quad' | 'quart' | 'quint' | 'sine'>;
+import type { IStringEasings } from './easing-types';
 
 const PI2 = Math.PI / 2;
 

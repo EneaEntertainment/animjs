@@ -1,11 +1,11 @@
-import Delay from './delay';
-import type Group from './group';
-import type { IDelayData } from './delay';
-import type { ITimelineData } from './timeline';
-import type { ITweenData } from './tween';
-import Timeline from './timeline';
-import Tween from './tween';
-import { defaultSettings } from './shared';
+import Delay from '../delay/delay';
+import type Group from '../group/group';
+import type { IDelayData } from '../delay/delay-types';
+import type { ITimelineData } from '../timeline/timeline-types';
+import type { ITweenData } from '../tween/tween-types';
+import Timeline from '../timeline/timeline';
+import Tween from '../tween/tween';
+import { defaultSettings } from '../shared';
 
 export default class Ticker
 {

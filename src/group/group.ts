@@ -1,6 +1,6 @@
-import Delay from './delay';
-import Timeline from './timeline';
-import Tween from './tween';
+import Delay from '../delay/delay';
+import Timeline from '../timeline/timeline';
+import Tween from '../tween/tween';
 
 export default class Group
 {

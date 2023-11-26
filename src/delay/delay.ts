@@ -1,17 +1,8 @@
-import { animGroup, defaultSettings } from './shared';
+import { animGroup, defaultSettings } from '../shared';
 
-import Group from './group';
+import Group from '../group/group';
+import type { IDelayData } from './delay-types';
 import { Runner } from '@enea-entertainment/runner';
-
-export interface IDelayData
-{
-    protected: boolean;
-    autoUpdate: boolean;
-    duration: number;
-    group: string | number;
-
-    onComplete: (...args: Array<any>)=> void;
-}
 
 export default class Delay
 {

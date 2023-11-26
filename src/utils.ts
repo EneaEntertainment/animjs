@@ -1,4 +1,4 @@
-import type { ITweenData, ITweenValue } from './tween';
+import type { ITweenData, ITweenValue } from './tween/tween-types';
 
 const str = Object.prototype.toString;
 

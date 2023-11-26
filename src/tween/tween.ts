@@ -1,38 +1,11 @@
-import { animGroup, defaultSettings } from './shared';
+import type { ITweenData, ITweenRunners, ITweenValue } from './tween-types';
+import { animGroup, defaultSettings } from '../shared';
 
-import Group from './group';
-import type { IStringEasings } from './easing';
+import Group from '../group/group';
+import type { IStringEasings } from '../easing/easing-types';
 import { Runner } from '@enea-entertainment/runner';
-import { getEasing } from './easing';
-import { getTargets } from './utils';
-
-export interface IDefaultTweenData
-{
-    paused: boolean;
-    protected: boolean;
-    autoUpdate: boolean;
-
-    delay: number;
-    duration: number;
-    group?: string | number;
-    yoyo: boolean;
-    repeat: number;
-    repeatDelay: number;
-    ease: IStringEasings | ((time: number)=> number);
-    yoyoEase?: IStringEasings | ((time: number)=> number);
-}
-
-export interface ITweenData extends IDefaultTweenData
-{
-    onStart: ()=> void;
-    onUpdate: (target: unknown, progress: number)=> void;
-    onRepeat: (currentLoop: number)=> void;
-    onComplete: (...args: Array<any>)=> void;
-
-    [key: string]: any;
-}
-
-export type ITweenValue = [string, number | Array<number>, number | Array<number>];
+import { getEasing } from '../easing/easing';
+import { getTargets } from '../utils';
 
 const enum ValueIndex { key, start, end }
 
@@ -68,7 +41,7 @@ export default class Tween
 
     timeScale = 1;
 
-    protected runners: Record<string, Runner> =
+    protected runners: ITweenRunners =
         {
             start    : new Runner('onStart|1'),
             update   : new Runner('onUpdate|2'),
@@ -291,7 +264,7 @@ export default class Tween
 
         this.kill(true);
 
-        Object.keys(this.runners).forEach((key: string) => { this.runners[key].detachAll(); });
+        Object.keys(this.runners).forEach((key: string) => { this.runners[key as keyof ITweenRunners].detachAll(); });
 
         this.destroyed = true;
         this.target = null;

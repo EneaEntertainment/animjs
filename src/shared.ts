@@ -1,5 +1,5 @@
-import type Group from './group';
-import type { IDefaultTweenData } from './tween';
+import type Group from './group/group';
+import type { IDefaultTweenData } from './tween/tween-types';
 
 export const animGroup: Record<string, Group> = {};
 

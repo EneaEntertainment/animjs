@@ -1,29 +1,11 @@
-import { animGroup, defaultSettings } from './shared';
+import type { ITimelineData, ITimelineLabelData, ITimelineRunners } from './timeline-types';
+import { animGroup, defaultSettings } from '../shared';
 
-import Group from './group';
-import type { ITweenData } from './tween';
+import Group from '../group/group';
+import type { ITweenData } from '../tween/tween-types';
 import { Runner } from '@enea-entertainment/runner';
-import Tween from './tween';
-import { randomString } from './utils';
-
-export interface ITimelineData
-{
-    paused: boolean;
-    protected: boolean;
-    autoUpdate: boolean;
-    delay: number;
-    group: string | number;
-
-    onStart: ()=> void;
-    onUpdate: (activeLabelIndex: number, progress: number)=> void;
-    onComplete: (...args: Array<any>)=> void;
-}
-
-export interface ITimelineLabelData
-{
-    duration: number;
-    tweens: Array<Tween>
-}
+import Tween from '../tween/tween';
+import { randomString } from '../utils';
 
 export default class Timeline
 {
@@ -50,7 +32,7 @@ export default class Timeline
 
     timeScale = 1;
 
-    protected runners: Record<string, Runner> =
+    protected runners: ITimelineRunners =
         {
             start    : new Runner('onStart'),
             update   : new Runner('onUpdate|2'),
@@ -278,7 +260,7 @@ export default class Timeline
 
         this.kill(true);
 
-        Object.keys(this.runners).forEach((key: string) => { this.runners[key].detachAll(); });
+        Object.keys(this.runners).forEach((key: string) => { this.runners[key as keyof ITimelineRunners].detachAll(); });
 
         if (typeof this.groupName !== 'undefined' && typeof animGroup[this.groupName] !== 'undefined')
             animGroup[this.groupName].remove(this);
