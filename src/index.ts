@@ -17,3 +17,4 @@ export { Tween };
 export { Timeline };
 export { Delay };
 export { animGroup };
+export * from './easing/easing-types';
