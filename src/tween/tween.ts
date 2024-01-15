@@ -207,8 +207,10 @@ export default class Tween
                 if (this.yoyo)
                     this.updateDirection(currentLoop);
 
+                const diff = this.time - this.duration;
+
                 // adjust time for repeat
-                this.time -= this.duration + this.repeatDelay;
+                this.time -= this.duration + this.repeatDelay + diff;
             }
             else
             {
